@@ -2,7 +2,7 @@
 /* SECTION 2 */
 
 
---SELECT
+--SELECTround(sum(quantity*cost_to_customer_per_qty),2) as spent
 /* 1. Write a query that returns everything in the customer table. */
 SELECT*FROM customer;
 
@@ -38,7 +38,7 @@ WHERE vendor_id >= 8 AND vendor_id <= 10;
 SELECT* ,
 quantity * cost_to_customer_per_qty as price
 FROM customer_purchases
-WHERE vendor_id BETWEEN 8 AND 10
+WHERE vendor_id BETWEEN 8 AND 10;
 
 
 --CASE (Case when .. then ..., case when is like "if')  
@@ -46,6 +46,7 @@ WHERE vendor_id BETWEEN 8 AND 10
 Using the product table, write a query that outputs the product_id and product_name
 columns and add a column called prod_qty_type_condensed that displays the word “unit” 
 if the product_qty_type is “unit,” and otherwise displays the word “bulk.” */
+
 SELECT 
 product_id, 
 product_name,
@@ -57,6 +58,7 @@ FROM product;
 /* 2. We want to flag all of the different types of pepper products that are sold at the market. 
 add a column to the previous query called pepper_flag that outputs a 1 if the product_name 
 contains the word “pepper” (regardless of capitalization), and otherwise outputs 0. */
+
 SELECT 
 product_id, 
 product_name,
@@ -72,6 +74,7 @@ FROM product;
 --JOIN
 /* 1. Write a query that INNER JOINs the vendor table to the vendor_booth_assignments table on the 
 vendor_id field they both have in common, and sorts the result by vendor_name, then market_date. */
+
 SELECT
 vb.vendor_id,
 vendor_name,
@@ -98,7 +101,7 @@ booth_number,
 count(booth_number) as num_booth_rental
 FROM vendor_booth_assignments
 GROUP BY vendor_id, booth_number  --only need to vendor_id, the reason to add booth_number is to double check
-ORDER BY vendor_id, booth_number  --add order by for easier to glance the data 
+ORDER BY vendor_id, booth_number;  --add order by for easier to glance the data 
 
 
 /* 2. The Farmer’s Market Customer Appreciation Committee wants to give a bumper 
@@ -107,17 +110,18 @@ of customers for them to give stickers to, sorted by last name, then first name.
 
 HINT: This query requires you to join two tables, use an aggregate function, and use the HAVING keyword. */
 
-SELECT DISTINCT
-customer_id,
-sum(quantity*cost_to_customer_per_qty) as spent
+SELECT
+cp.customer_id,
+customer_first_name,
+customer_last_name,
+round(sum(quantity*cost_to_customer_per_qty),2) as spent
 
-FROM customer_purchases
-GROUP BY customer_id	
-
-
-
-ORDER BY customer_last_name, customer_first_name
-SELECT*FROM customer_purchases
+FROM customer_purchases cp
+JOIN customer c
+	on c.customer_id = cp.customer_id
+GROUP BY cp.customer_id	
+HAVING spent >= 2000
+ORDER BY customer_last_name, customer_first_name;
 
 
 --Temp Table
@@ -132,6 +136,17 @@ When inserting the new vendor, you need to appropriately align the columns to be
 VALUES(col1,col2,col3,col4,col5) 
 */
 
+--1.clone the vendor table 
+DROP TABLE IF EXISTS temp.new_vendor; 
+CREATE TABLE temp.new_vendor AS 
+SELECT*FROM vendor;
+
+--2. add vendor id=10
+SELECT*FROM new_vendor --view the temp.table 
+INSERT INTO temp.new_vendor
+VALUES (10, 'Thomass Superfood Store', 'Fresh Focused store', 'Thomas', 'Rosenthal');
+
+SELECT*FROM new_vendor --view the temp.table  
 
 
 -- Date
@@ -140,6 +155,10 @@ VALUES(col1,col2,col3,col4,col5)
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
 and year are! */
 
+SELECT*,
+strftime('%Y', market_date) as year,
+strftime('%m',market_date) as month
+FROM customer_purchases;
 
 
 /* 2. Using the previous query as a base, determine how much money each customer spent in April 2022. 
@@ -147,4 +166,26 @@ Remember that money spent is quantity*cost_to_customer_per_qty.
 
 HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement!! */
+
+DROP TABLE IF EXISTS new_cus_purchase;
+CREATE TABLE temp.new_cus_purchase AS 
+SELECT*,
+CAST(strftime('%Y', market_date) as INTEGER) as year,
+CAST(strftime('%m',market_date) as INTEGER) as month
+FROM customer_purchases;
+
+-- SELECT*FROM new_cus_purchase --view table
+-- WHERE month=4 AND year=2022;
+
+SELECT
+ncp.customer_id,
+customer_first_name,
+customer_last_name,
+round(sum(quantity*cost_to_customer_per_qty),2) as spent
+
+FROM new_cus_purchase ncp
+JOIN customer c
+	on c.customer_id = ncp.customer_id
+WHERE month=4 AND year=2022
+GROUP BY ncp.customer_id;
 
