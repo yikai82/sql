@@ -1,31 +1,32 @@
---DISTINCT
+-- DISTINCT
 
--- without distinct, 4221 rows, of various customer_ids 
+--without distinct 4221 rows of various cust_ids
 SELECT customer_id FROM customer_purchases;
 
--- with DISTINCT, one row per customer, 26 rows total
+-- with distinct 26 rows of various cust_ids
 SELECT DISTINCT customer_id FROM customer_purchases;
 
--- without distinct, only wed/sat 150 times over
+--150 days the market was open
 SELECT market_day
 FROM market_date_info;
 
--- market is open sat/wed!
+-- market is only open wed and sat
 SELECT DISTINCT market_day
 FROM market_date_info;
 
-/* which vendor has sold products to a customer */
+/* which vendor has sold products to a customer */ -- 3 rows
 SELECT DISTINCT vendor_id
-FROM customer_purchases;  -- 3 rows, vendor_id 7,8,4
+FROM customer_purchases;
 
-
-
-/* which vendor has sold products to a customer AND which product was it... */
+/* which vendor has sold products to a customer ... and which product was it? */ -- 8 rows
 SELECT DISTINCT vendor_id, product_id
-FROM customer_purchases; -- 8 rows
+FROM customer_purchases;
 
-/* which vendor has sold products to a customer AND which product was it AND to whom was it sold ? */
-SELECT DISTINCT vendor_id, product_id, customer_id -- this is dissatisfying...let's have a name!
-FROM customer_purchases -- 200 rows
-ORDER by product_id ASC, customer_id DESC
+/* which vendor has sold products to a customer 
+... and which product was it? 
+... AND to whom was it sold*/ -- 200 rows
+SELECT DISTINCT vendor_id, customer_id, product_id
+FROM customer_purchases
+ORDER BY customer_id ASC, product_id DESC
+
 
