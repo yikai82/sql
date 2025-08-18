@@ -1,21 +1,29 @@
---INSERT UPDATE AND DELETE
+-- INSERT UPDATE DELETE
+
+-- 1) add a product to the temp TABLE
+-- 2) change the product_size for THAT product
+-- 3) delete our product
 
 DROP TABLE IF EXISTS temp.product_expanded;
-CREATE TEMP TABLE product_expanded AS 
+CREATE TEMP TABLE product_expanded AS
 	SELECT * FROM product;
 	
+--SELECT * FROM product_expanded
+
+--INSERT
 INSERT INTO product_expanded
-VALUES(26, 'Almonds', '1 lb',1, 'lbs');
+VALUES(24, 'Almonds', '1 lbs', 1, 'lbs');
 
---update our new record product_size to 1/2 kg
+--UPDATE
+--change the product_size for almonds to 1/2 kg
 UPDATE product_expanded
---SELECT * FROM product_expanded
 SET product_size = '1/2 kg', product_qty_type = 'kg'
-WHERE product_id = 26;
+WHERE product_id = 24;
 
--- delete our almonds
+--DELETE 
 DELETE FROM product_expanded
---SELECT * FROM product_expanded
-WHERE product_id = 26;
+--SELECT * FROM product_expanded -- can help you determine you are looking at the right rows before delete
+WHERE product_id = 24;
 
-SELECT * from product_expanded
+
+SELECT * FROM product_expanded

@@ -1,15 +1,23 @@
 -- SELECT 
 
---selecting everything from customer
+-- select everything from the customer TABLE
 SELECT * 
 FROM customer;
 
--- add a static value
-SELECT 2025 as this_year, 'April' as this_month, customer_id
+-- use sql as a calculator
+SELECT 1+1, 10*5, pi();
+
+--add a static value
+SELECT 2025 as this_year, 'August' as this_month, customer_id
 FROM customer;
 
--- add an order by + limit
+-- add an order by and limit 
 SELECT * 
 FROM customer
-ORDER BY customer_last_name
-LIMIT 10
+ORDER BY customer_first_name
+LIMIT 10;
+
+-- select multiple columns
+SELECT customer_id, customer_first_name
+FROM customer;
+
